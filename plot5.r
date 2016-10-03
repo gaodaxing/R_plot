@@ -1,0 +1,13 @@
+NEI <- readRDS("summarySCC_PM25.rds")
+SCC <- readRDS("Source_Classification_Code.rds")
+library(dplyr)
+library(ggplot2)
+V<-grepl("Vehicles",SCC$EI.Sector)
+SCC_V<-SCC[V,]$SCC
+NEI_V<-subset(NEI,SCC %in% SCC_V)
+bal_sub_V<-subset(NEI_V,fips=="24510")
+EPY_V<-tapply(bal_sub_V$Emissions,bal_sub_V$year,sum,na.rm=T)
+plot(names(EPY_V),EPY_V,type="l",xlab="year",ylab="PM2.5 Emission (ton)")
+title(main="motor vehicle PM2.5 Emission per year")
+dev.copy(png,"plot5.png",height=500,width=450)
+dev.off()

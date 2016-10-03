@@ -1,0 +1,17 @@
+NEI <- readRDS("summarySCC_PM25.rds")
+SCC <- readRDS("Source_Classification_Code.rds")
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+V<-grepl("Vehicles",SCC$EI.Sector)
+SCC_V<-SCC[V,]$SCC
+NEI_V<-subset(NEI,SCC %in% SCC_V)
+sub_V<-subset(NEI_V,fips=="24510"|fips=="06037")
+EPY_V<-as.data.frame(tapply(sub_V$Emissions,list(sub_V$year,sub_V$fips),sum,na.rm=T))
+EPY_V$year<-rownames(EPY_V)
+EPY_Vn<-melt(EPY_V,id="year")
+names(EPY_Vn)[2]<-"City"
+g<-ggplot(EPY_Vn,aes(year,value,colour=City,group=City))+geom_line()+ylab("PM2.5 Emission (ton)")+ggtitle("Baltimore and Los Angeles PM2.5 Emission from motor vehicle sources per year")
+g+scale_color_manual(labels = c("Los Angeles", "Baltimore"),values = c("blue", "red"))
+dev.copy(png,"plot6.png",height=500,width=450)
+dev.off()

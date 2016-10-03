@@ -1,0 +1,12 @@
+NEI <- readRDS("summarySCC_PM25.rds")
+SCC <- readRDS("Source_Classification_Code.rds")
+library(dplyr)
+library(ggplot2)
+CoalComb<-grepl("Coal",SCC$EI.Sector)&grepl("Comb",SCC$EI.Sector)
+SCC_CoalComb<-SCC[CoalComb,]$SCC
+NEI_CC<-subset(NEI,SCC %in% SCC_CoalComb)
+EPY_CC<-tapply(NEI_CC$Emissions,NEI_CC$year,sum,na.rm=T)
+plot(names(EPY_CC),EPY_CC,type="l",xlab="year",ylab="PM2.5 Emission (ton)")
+title(main="coal combustion-related PM2.5 Emission per year")
+dev.copy(png,"plot4.png",height=500,width=450)
+dev.off()
